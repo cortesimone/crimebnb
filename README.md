@@ -1,7 +1,7 @@
 crimebnb
 ========
 
-crimebnb is a mapping demo that maps available SF Airbnb properties against local SF crime location data.
+Crimebnb is a mapping demo that maps available SF Airbnb properties against local SF crime location data.
 
 Curious about how this looks in action? Check out the [demo page].
 
