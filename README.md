@@ -3,6 +3,7 @@ crimebnb
 
 crimebnb is a mapping demo that maps available SF Airbnb properties against local SF crime location data.
 
+Curious about how this looks in action? Check out the [demo page].
 
 ### Airbnb data
 
@@ -43,8 +44,8 @@ License
 MIT
 
 
-
+[demo page]:http://devinmancuso.com/projects/crimebnb
 [PHP Simple HTML DOM Parser]:http://simplehtmldom.sourceforge.net/
-[sanfrancisco.crimespotting.org]:sanfrancisco.crimespotting.org
-[API]:sanfrancisco.crimespotting.org/api
+[sanfrancisco.crimespotting.org]:http://sanfrancisco.crimespotting.org
+[API]:http://sanfrancisco.crimespotting.org/api
 [Google Maps V3 API]:https://developers.google.com/maps/documentation/javascript/examples/layer-heatmap
