@@ -36,12 +36,14 @@ The following crimes were included in the data:
 The crime location data is then stored in an array and a heatmap is generated using the [Google Maps V3 API].
 
 
-
-
-License
-----
+###License
 
 MIT
+
+###Legal & Acknowledgements
+
+Crimebnb is in no way affiliated or condoned by Airbnb.
+Location listing data and the Bélo logo are the property of Airbnb.
 
 
 [demo page]:http://devinmancuso.com/projects/crimebnb
