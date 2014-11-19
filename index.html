@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <!-- Declare meta -->
+
+    <meta charset="utf-8">
+    <meta name="og:title" content="crimebnb: mapping SF Airbnb listings against local crime data.">
+    <meta name="description" content="crimebnb is a mapping demo that maps available SF Airbnb properties against local SF crime location data.">
+    <meta property="og:type" content="website" >
+    <meta property="og:image" content="http://devinmancuso.com/projects/crimebnb/img/crimebnb-meta.png" />
+    <meta property="og:url" content="http://devinmancuso.com/projects/crimebnb/index.html">
+    <meta property="og:site_name" content="Devin Mancuso - Does Digital">
+    <title>crimebnb - Devin Mancuso</title>
+    
+    <!-- Twitter card meta -->
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@devinmancuso">
+    <meta name="twitter:creator" content="@devinmancuso">
+    <meta name="twitter:title" content="crimebnb: mapping SF Airbnb listings against local crime data.">
+    <meta name="twitter:description" content="crimebnb is a mapping demo that maps available SF Airbnb properties against local SF crime location data.">
+
+
+    <!-- Link styles and fonts -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
+    
+    <!-- Load jQuery and Google Maps API V3 -->
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+    
+    <!-- Main inline script -->
+
+    <script type="text/javascript">
+
+      var map, pointarray, heatmap;
+
+      var sfCrimeData = new Array();
+      var pointArray = new Array();
+
+      function initialize() {
+       
+          //Display the loading screen while the google map is built and crime data is pulled down from the API.
+          $('#modal').delay(5000).fadeOut('fast');
+
+
+          //Define map options
+          var mapOptions = {
+            zoom: 13,
+            center: new google.maps.LatLng(37.774546, -122.433523),
+            mapTypeId: google.maps.MapTypeId.TERRAIN
+
+          };
+
+          //Create map
+          map = new google.maps.Map(document.getElementById('map-canvas'),
+              mapOptions);
+
+
+          //Start the crime heatmap function;
+          setCrimeMap(map);
+
+          //Declare global infoWindow Variable
+          infoWindow = new google.maps.InfoWindow({});
+
+      } //End initialise()
+
+      //Create var to host the API crime data
+      var jsondata; 
+
+      function setCrimeMap(map) {
+
+          $.ajax({
+              async: false,
+              url: "http://sanfrancisco.crimespotting.org/crime-data?format=json&count=500&type=aggravated_assault,%20murder,%20robbery,%20simple_assault,%20arson,%20burglary,%20theft,%20vandalism,%20vehicle_theft,%20alcohol,%20disturbing_the_peace,%20narcotics,%20prostitution&dstart=2010-01-01&dend=2014-10-01",
+              jsonpCallback: "myCallback",
+              type: "GET",
+              dataType: "jsonp",
+              contentType: "application/json",
+              success: function( json ) {
+                    
+                    jsondata = json;
+                    buildCrime();
+
+
+              }      
+          });
+      }
+
+      function buildCrime() {
+
+          //loop between each of the json elements
+          for (var i = 0, length = jsondata.features.length; i < length; i++) {
+              
+              sfCrimeData.push(new google.maps.LatLng(jsondata.features[i].geometry.coordinates[1],jsondata.features[i].geometry.coordinates[0]));
+
+              // Some console checks to ensure everything is looping correctly
+              //console.log('this crime row');
+              //console.log(sfCrimeData[i]);
+              //console.log('the whole sf crime thing so far');
+              //console.log(sfCrimeData);
+
+          }
+
+          //Create a pointArray consisting of al the crime data latLng coords
+          var pointArray = new google.maps.MVCArray(sfCrimeData);
+
+          //Create the heatmap and set the options. Define colour and presentation options. 
+          heatmap = new google.maps.visualization.HeatmapLayer({
+            data: pointArray,
+            radius: 20,
+            opacity: 0.9,
+            gradient: [
+            'rgba(0, 255, 255, 0)',
+            'rgba(0, 255, 255, 1)',
+            'rgba(0, 191, 255, 1)',
+            'rgba(0, 127, 255, 1)',
+            'rgba(0, 63, 255, 1)',
+            'rgba(0, 0, 255, 1)',
+            'rgba(0, 0, 223, 1)',
+            'rgba(0, 0, 191, 1)',
+            'rgba(0, 0, 159, 1)',
+            'rgba(0, 0, 127, 1)',
+            'rgba(63, 0, 91, 1)',
+            'rgba(127, 0, 63, 1)',
+            'rgba(191, 0, 31, 1)',
+            'rgba(255, 0, 0, 1)'
+            ]
+          });
+
+            //Set the heatmap layer to the map object
+            heatmap.setMap(map);
+
+            //Set the listing markers
+            setMarkers(map);
+      }
+
+      //Pull down the Airbnb location listing details from the cached local file produced by the PHP scraper
+      function setMarkers(map) {
+          var json = (function () { 
+              var json = null; 
+              $.ajax({ 
+                  'async': false, 
+                  'global': false, 
+                  'url': "local/airbnbdata.json", 
+                  'dataType': "json", 
+                  'success': function (data) {
+                       json = data;
+                       //console.log(data); 
+                   }
+              });
+              return json;
+          })();
+
+          //loop between each of the json elements
+          for (var i = 0, length = json.length; i < length; i++) {
+              var data = json[i],
+              latLng = new google.maps.LatLng(data.Lat, data.Lng);
+              //console.log(data); 
+
+              // Creating a marker and putting it on the map
+              var marker = new google.maps.Marker({
+                  position: latLng,
+                  map: map,
+                  title: data.Name
+              });
+              
+              infoBox(map, marker, data);
+              
+          }
+      }
+
+      //Creat the infoBox that shows the title and URL when you click on a marker
+      function infoBox(map, marker, data) {
+          // Attaching a click event to the current marker
+          google.maps.event.addListener(marker, "click", function(e) {
+          });
+
+          // Creating a closure to retain the correct data 
+          // Pass the current data in the loop into the closure (marker, data)
+          (function(marker, data) {
+            
+            // Attaching a click event to the current marker
+            google.maps.event.addListener(marker, "click", function(e) {
+                infoWindow.setContent('<strong>' + data.Name + '</strong>' + '<br>' + '<a href="http://www.airbnb.com' + data.Url + '">http://www.airbnb.com' + data.Url + '</a>');
+                infoWindow.open(map, marker);
+            });
+
+          })(marker, data);
+      }
+
+      //Add DOM listener
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+
+  <body>
+
+    <div id="map-canvas"></div>
+
+    <div id="info-canvas">
+        <img id="info-logo" src="img/crimebnblogo.png" />
+        <p id="info-title">crimebnb: <a href="">a weekend hack project</a> mapping SF Airbnb listings against crime data. By <a href="http://www.twitter.com/devinmancuso">Devin Mancuso</a></p>
+    </div>   
+
+    <div id="modal">
+        <div id="logo"></div>
+        <p id="loadingtext">loading crime data<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i></p>
+    </div>
+    
+  </body>
+</html>

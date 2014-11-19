@@ -1,0 +1,102 @@
+html, body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px
+}
+
+#map-canvas {
+  height: 90%;
+  margin: 0px;
+  padding: 0px
+}
+
+#info-canvas {
+  bottom: 0px;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+#info-logo {
+  width: 85px;
+  height: 66px;
+  z-index: 1001;
+  float: left;
+  margin: 15px;
+}
+
+#info-title {
+  font-family: 'Roboto', sans-serif;
+  color: #454444;;
+  font-size: 24px;
+  font-weight: 100;
+  margin-left: 25px;
+  position: absolute;
+  left: 100px;
+}
+
+#panel {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  margin-left: -180px;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+}
+
+#modal {
+    display:    block;
+    position:   fixed;
+    z-index:    999;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background-color: #ec5f5f;
+    background-size: contain;
+}
+
+#logo {
+    background: transparent url('../img/crimebnblogo.png') center center no-repeat;
+    background-size: contain;
+    margin: 0 auto;
+    width: 50%;
+    z-index: 1000;
+    height: 266px;
+    margin-top: 250px;
+}
+
+#loadingtext {
+  font-family: 'Roboto', sans-serif;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 100;
+  text-align: center;
+  margin-top: 25px;
+}
+
+.ellipsis i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.0s;
+}
+
+.ellipsis i+i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.2s;
+}
+
+.ellipsis i+i+i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.3s;
+}
+
+@-webkit-keyframes dot {
+      0% { opacity: 0; }
+     50% { opacity: 0; }
+    100% { opacity: 1; }
+}
